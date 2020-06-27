@@ -1,75 +1,155 @@
+Problem 9
+public class Solution {
+    public bool IsPalindrome(int x) {
+        // Special cases:
+        // As discussed above, when x < 0, x is not a palindrome.
+        // Also if the last digit of the number is 0, in order to be a palindrome,
+        // the first digit of the number also needs to be 0.
+        // Only 0 satisfy this property.
+        if(x < 0 || (x % 10 == 0 && x != 0)) {
+            return false;
+        }
+
+        int revertedNumber = 0;
+        while(x > revertedNumber) {
+            revertedNumber = revertedNumber * 10 + x % 10;
+            x /= 10;
+        }
+
+        // When the length is an odd number, we can get rid of the middle digit by revertedNumber/10
+        // For example when the input is 12321, at the end of the while loop we get x = 12, revertedNumber = 123,
+        // since the middle digit doesn't matter in palidrome(it will always equal to itself), we can simply get rid of it.
+        return x == revertedNumber || x == revertedNumber/10;
+    }
+}
 Problem 19
-var strResult = '<br />The # of Sundays that were the 1st are: ';
-var daysInMonth = [0,31,0,31,30,31,30,31,31,30,31,30,31];
-function daysInFeb(year) {
-    if (year % 4 != 0) return 28;
-    if (year % 100 == 0 && year % 400 != 0) return 28;
-    return 29;
-}
-//we are going to calc by days - since Jan 1, 1900 is 1, then every divisble 7 is a Sunday, and if we take
-//1 and add 31, that would be feb 1st, and add 28 to that and that would be Mar 1, and so on...
-function calcSundays() {
-    var Day = 1;
-    var totSunday = 0;
-    for (var month = 0; ++month < 13;) {
-        //we are doing 1900 first, since there are no checks for Sundays (1901+)
-        Day += (month == 2) ? daysInFeb(1900) : daysInMonth[month];
+public ListNode removeNthFromEnd(ListNode head, int n) {
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+    ListNode first = dummy;
+    ListNode second = dummy;
+    // Advances first pointer so that the gap between first and second is n nodes apart
+    for (int i = 1; i <= n + 1; i++) {
+        first = first.next;
     }
-    for (var year = 1900; ++year < 2001;) {    //at this point we are at Jan 1, 1901
-        for (month = 0; ++month < 13;) {
-            if (Day % 7 == 0) totSunday++;
-            Day += (month == 2) ? daysInFeb(year) : daysInMonth[month];
+    // Move first to the end, maintaining the gap
+    while (first != null) {
+        first = first.next;
+        second = second.next;
+    }
+    second.next = second.next.next;
+    return dummy.next;
+}
+Problem 29
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        if (strs.length == 0) return new ArrayList();
+        Map<String, List> ans = new HashMap<String, List>();
+        int[] count = new int[26];
+        for (String s : strs) {
+            Arrays.fill(count, 0);
+            for (char c : s.toCharArray()) count[c - 'a']++;
+
+            StringBuilder sb = new StringBuilder("");
+            for (int i = 0; i < 26; i++) {
+                sb.append('#');
+                sb.append(count[i]);
+            }
+            String key = sb.toString();
+            if (!ans.containsKey(key)) ans.put(key, new ArrayList());
+            ans.get(key).add(s);
         }
+        return new ArrayList(ans.values());
     }
-    return totSunday;
 }
-
-strResult += calcSundays(); 
-Problem 29 
-var main = function() {
-
-    var arr = [];
-
-    for (var a = 2; a <= 100; a++) {
-        for (var b = 2; b <= 100; b++) {
-            arr.push(BigInt(Math.pow(a, b)));
-        }
-    }
-    //arr.sort((a, b) => a - b);
-
-    return arr.filter(function(elem, pos) {
-        return arr.indexOf(elem) == pos;
-    }).length;
-}
-
-console.log(main());
 
 Problem 39
-var perimeterCombinationCounts = [];
+Given a set of candidate numbers (candidates) (without duplicates) and a target number (target), find all unique combinations in candidates where the candidate numbers sums to target.
 
-for(a = 1; a < 999; a++){
-    for(b = a; b < (999-a); b++){
-        var c = Math.sqrt(a*a + b*b);
-        if(c%1 == 0){
-            var perimeter = a + b + c;
-            if(perimeter <= 1000){
-                perimeterCombinationCounts[perimeter] = (perimeterCombinationCounts[perimeter] || 0) + 1;
-            }
+The same repeated number may be chosen from candidates unlimited number of times.
+
+Note:
+
+All numbers (including target) will be positive integers.
+The solution set must not contain duplicate combinations.
+Example 1:
+
+Input: candidates = [2,3,6,7], target = 7,
+A solution set is:
+[
+  [7],
+  [2,2,3]
+]
+Example 2:
+
+Input: candidates = [2,3,5], target = 8,
+A solution set is:
+[
+  [2,2,2,2],
+  [2,3,3],
+  [3,5]
+]
+
+
+
+List<List<Integer>> res;
+    int[] candidates;
+    
+    public List<List<Integer>> combinationSum(int[] _candidates, int target) {
+        this.candidates = _candidates;
+        Arrays.sort(this.candidates);
+        res = new ArrayList<List<Integer>>();
+        helper(0,target, new ArrayList<Integer>());
+        return res;
+    }
+    
+    private void helper(int idx, int target, List<Integer> lst){
+        if(target==0){
+            res.add(new ArrayList<Integer>(lst));
+            return;
+        }
+        for(int i = idx; i<candidates.length;i++){
+            if(target-candidates[i]<0)break;
+            lst.add(candidates[i]);
+            helper(i,target-candidates[i],lst);
+            lst.remove(lst.size()-1);
         }
     }
 }
 
-var maxCombinations = 0;
-var maxCombinationsPerimeter = 0;
 
-for(var perimeter = 0; perimeter <= 1000; perimeter++){
-    var combinations = perimeterCombinationCounts[perimeter];
-    if(combinations && combinations > maxCombinations){
-        console.log('perimeter: ' + perimeter + '  combinations: ' + combinations);
-        maxCombinations = combinations;
-        maxCombinationsPerimeter = perimeter;
-    }        
-}
-        
-console.log(maxCombinationsPerimeter);
+Given an array of strings, group anagrams together.
 
+Example:
+
+Input: ["eat", "tea", "tan", "ate", "nat", "bat"],
+Output:
+[
+  ["ate","eat","tea"],
+  ["nat","tan"],
+  ["bat"]
+]
+Note:
+
+All inputs will be in lowercase.
+The order of your output does not matter.
+
+
+
+var groupAnagrams = function(strs) {
+    const map = new Map();
+    
+    function charCounter(str) {
+        const arr = Array(26).fill(0);
+        for(let c of str) arr[c.charCodeAt() - 97]++;
+        return JSON.stringify(arr);
+    }
+    
+    for(let word of strs) {
+        const key = charCounter(word);
+        if(map.has(key)) map.get(key).push(word);
+        else map.set(key, [word]);
+    }
+    
+    return [...map.values()];
+};

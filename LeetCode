@@ -1,0 +1,75 @@
+Problem 19
+var strResult = '<br />The # of Sundays that were the 1st are: ';
+var daysInMonth = [0,31,0,31,30,31,30,31,31,30,31,30,31];
+function daysInFeb(year) {
+    if (year % 4 != 0) return 28;
+    if (year % 100 == 0 && year % 400 != 0) return 28;
+    return 29;
+}
+//we are going to calc by days - since Jan 1, 1900 is 1, then every divisble 7 is a Sunday, and if we take
+//1 and add 31, that would be feb 1st, and add 28 to that and that would be Mar 1, and so on...
+function calcSundays() {
+    var Day = 1;
+    var totSunday = 0;
+    for (var month = 0; ++month < 13;) {
+        //we are doing 1900 first, since there are no checks for Sundays (1901+)
+        Day += (month == 2) ? daysInFeb(1900) : daysInMonth[month];
+    }
+    for (var year = 1900; ++year < 2001;) {    //at this point we are at Jan 1, 1901
+        for (month = 0; ++month < 13;) {
+            if (Day % 7 == 0) totSunday++;
+            Day += (month == 2) ? daysInFeb(year) : daysInMonth[month];
+        }
+    }
+    return totSunday;
+}
+
+strResult += calcSundays(); 
+Problem 29 
+var main = function() {
+
+    var arr = [];
+
+    for (var a = 2; a <= 100; a++) {
+        for (var b = 2; b <= 100; b++) {
+            arr.push(BigInt(Math.pow(a, b)));
+        }
+    }
+    //arr.sort((a, b) => a - b);
+
+    return arr.filter(function(elem, pos) {
+        return arr.indexOf(elem) == pos;
+    }).length;
+}
+
+console.log(main());
+
+Problem 39
+var perimeterCombinationCounts = [];
+
+for(a = 1; a < 999; a++){
+    for(b = a; b < (999-a); b++){
+        var c = Math.sqrt(a*a + b*b);
+        if(c%1 == 0){
+            var perimeter = a + b + c;
+            if(perimeter <= 1000){
+                perimeterCombinationCounts[perimeter] = (perimeterCombinationCounts[perimeter] || 0) + 1;
+            }
+        }
+    }
+}
+
+var maxCombinations = 0;
+var maxCombinationsPerimeter = 0;
+
+for(var perimeter = 0; perimeter <= 1000; perimeter++){
+    var combinations = perimeterCombinationCounts[perimeter];
+    if(combinations && combinations > maxCombinations){
+        console.log('perimeter: ' + perimeter + '  combinations: ' + combinations);
+        maxCombinations = combinations;
+        maxCombinationsPerimeter = perimeter;
+    }        
+}
+        
+console.log(maxCombinationsPerimeter);
+
